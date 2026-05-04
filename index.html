@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday, Baby ❤️</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg1: #ffd6e8;
+      --bg2: #f3d1ff;
+      --bg3: #ffe4c4;
+      --primary: #ff4f9a;
+      --secondary: #8f5bff;
+      --card: rgba(255, 255, 255, 0.25);
+      --text: #4a2349;
+      --shadow: 0 12px 30px rgba(128, 45, 102, 0.25);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    .hearts, .sparkles, .confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .heart, .sparkle, .piece {
+      position: absolute;
+      opacity: 0.8;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    .heart {
+      color: #ff2d7a;
+      animation-name: floatUp;
+    }
+
+    .sparkle {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 0 14px rgba(255,255,255,0.8);
+      animation-name: twinkle;
+    }
+
+    .piece {
+      width: 10px;
+      height: 14px;
+      background: hsl(var(--h), 90%, 60%);
+      animation-name: fall;
+      opacity: 0;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0.8) rotate(0deg); opacity: 0; }
+      15% { opacity: 0.9; }
+      100% { transform: translateY(-15vh) scale(1.25) rotate(360deg); opacity: 0; }
+    }
+
+    @keyframes twinkle {
+      0%,100% { transform: scale(0.5); opacity: 0.2; }
+      50% { transform: scale(1.4); opacity: 1; }
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-10vh) rotate(0); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(700deg); opacity: 0; }
+    }
+
+    .app {
+      width: min(90vw, 760px);
+      min-height: 430px;
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      padding: 2rem;
+      display: grid;
+      place-content: center;
+      gap: 1.3rem;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.96);
+      pointer-events: none;
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .screen.active {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 2.6vw, 2.3rem);
+      line-height: 1.35;
+    }
+
+    .script {
+      font-family: 'Pacifico', cursive;
+      color: #d31877;
+      text-shadow: 0 4px 12px rgba(255,255,255,0.5);
+    }
+
+    .btn-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+      min-height: 70px;
+      position: relative;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 0.8rem 1.2rem;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+      box-shadow: 0 8px 18px rgba(127, 37, 102, 0.3);
+      color: white;
+      background: linear-gradient(135deg, var(--primary), #ff8bbf);
+    }
+
+    button.alt {
+      background: linear-gradient(135deg, var(--secondary), #b889ff);
+    }
+
+    button:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 12px 24px rgba(96, 30, 93, 0.35);
+      filter: saturate(1.1);
+    }
+
+    button:active { transform: scale(0.98); }
+
+    .tooltip {
+      font-size: 0.95rem;
+      min-height: 1.2rem;
+      color: #7d2e76;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .tooltip.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tiny {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .music-toggle, .restart-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 0.9rem;
+      padding: 0.55rem 0.95rem;
+      background: rgba(255,255,255,0.35);
+      color: #5a215a;
+      border: 1px solid rgba(255,255,255,0.75);
+      box-shadow: 0 5px 12px rgba(94, 43, 84, 0.22);
+    }
+
+    .restart-btn { top: auto; bottom: 1rem; right: 1rem; }
+
+    .popup, .overlay {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      z-index: 6;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .popup.show, .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .popup-card {
+      background: white;
+      color: #60245f;
+      border-radius: 16px;
+      padding: 1.2rem 1.3rem;
+      box-shadow: var(--shadow);
+      max-width: 90vw;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .overlay {
+      background: rgba(80, 0, 50, 0.82);
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .cry {
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 0.2rem;
+      animation: wobble 1s ease-in-out infinite;
+    }
+
+    @keyframes wobble {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+
+    @media (max-width: 560px) {
+      .app, .screen { padding: 1.3rem; }
+      .music-toggle, .restart-btn { font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="hearts" id="heartsLayer"></div>
+  <div class="sparkles" id="sparklesLayer"></div>
+  <div class="confetti" id="confettiLayer"></div>
+
+  <main class="app" aria-live="polite">
+    <button class="music-toggle" id="musicToggle" aria-label="Toggle music">🎵 Music: Off</button>
+
+    <section class="screen active" id="screen1">
+      <h1 class="type-text" data-text="Hey baby, do you love me? ❤️"></h1>
+      <div class="btn-wrap" id="noZone1">
+        <button id="yes1">Yes, obviously 😍</button>
+        <button class="alt" id="no1">No 🙄</button>
+      </div>
+      <p class="tooltip" id="tooltip1">Are you sureee? 🤨 Try again 😏</p>
+    </section>
+
+    <section class="screen" id="screen2">
+      <h1 class="type-text" data-text="Are you ready to spend the rest of your life with me? 💍🥺"></h1>
+      <div class="btn-wrap">
+        <button id="yes2">Yes, I am 💖</button>
+        <button class="alt" id="thinkBtn">Let me think 🤔</button>
+      </div>
+      <p class="tiny">Hint: There is only one right answer 😌</p>
+    </section>
+
+    <section class="screen" id="screen3">
+      <h1 class="type-text" data-text="Baby, it's your birthday today 🎉🥳\nWhat better gift could you ask for than me? 😎❤️"></h1>
+      <div class="btn-wrap">
+        <button id="yes3">True, best gift ever 😌</button>
+        <button class="alt" id="hmmBtn">Hmm… not sure 🤨</button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen4">
+      <h1 class="script type-text" data-text="Happy Birthday my babyyyyy ❤️🎂\nI love you soooo much 🥺✨\nSomething special is waiting for you… go check 😉💖"></h1>
+      <div class="btn-wrap">
+        <button id="surpriseBtn">Open your surprise 🎁</button>
+      </div>
+      <button class="restart-btn" id="restartBtn">Relive the magic 💫</button>
+    </section>
+  </main>
+
+  <div class="popup" id="popup">
+    <div class="popup-card">
+      Thinking is overrated… just say yes 😌❤️
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div>
+      <div class="cry">😭 😭 😭</div>
+      <h2>Excuse me?? You won’t find a better one than me 😤❤️ Try again.</h2>
+    </div>
+  </div>
+
+  <script>
+    // Core app state
+    const state = {
+      current: 0,
+      thinkClicks: 0,
+      musicPlaying: false,
+      screens: [...document.querySelectorAll('.screen')]
+    };
+
+    // Small click pop sound generated from WebAudio
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let musicTimer = null;
+    let activeMusicNodes = [];
+    function playClickTone(freq = 680, duration = 0.08) {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      g.gain.value = 0.05;
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start();
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      o.stop(audioCtx.currentTime + duration);
+    }
+
+    function stopBackgroundMusic() {
+      if (musicTimer) {
+        clearInterval(musicTimer);
+        musicTimer = null;
+      }
+      activeMusicNodes.forEach(({ osc, gain }) => {
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
+        osc.stop(audioCtx.currentTime + 0.25);
+      });
+      activeMusicNodes = [];
+    }
+
+    function playMusicNote(freq, duration = 0.5, delay = 0) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, audioCtx.currentTime + delay);
+      gain.gain.linearRampToValueAtTime(0.03, audioCtx.currentTime + delay + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + delay + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(audioCtx.currentTime + delay);
+      osc.stop(audioCtx.currentTime + delay + duration + 0.08);
+      activeMusicNodes.push({ osc, gain });
+    }
+
+    function startBackgroundMusic() {
+      const pattern = [523.25, 659.25, 783.99, 659.25, 698.46, 659.25, 587.33, 523.25];
+      let idx = 0;
+      const beat = 0.42;
+      stopBackgroundMusic();
+      musicTimer = setInterval(() => {
+        playMusicNote(pattern[idx % pattern.length], 0.4, 0);
+        playMusicNote(pattern[(idx + 2) % pattern.length] / 2, 0.5, 0.05);
+        idx++;
+      }, beat * 1000);
+    }
+
+    function createParticles() {
+      const heartsLayer = document.getElementById('heartsLayer');
+      const sparklesLayer = document.getElementById('sparklesLayer');
+      for (let i = 0; i < 20; i++) {
+        const heart = document.createElement('span');
+        heart.className = 'heart';
+        heart.textContent = '❤';
+        heart.style.left = `${Math.random() * 100}%`;
+        heart.style.fontSize = `${14 + Math.random() * 20}px`;
+        heart.style.animationDuration = `${6 + Math.random() * 8}s`;
+        heart.style.animationDelay = `${Math.random() * 8}s`;
+        heartsLayer.appendChild(heart);
+      }
+      for (let i = 0; i < 26; i++) {
+        const sparkle = document.createElement('span');
+        sparkle.className = 'sparkle';
+        sparkle.style.left = `${Math.random() * 100}%`;
+        sparkle.style.top = `${Math.random() * 100}%`;
+        sparkle.style.animationDuration = `${1.8 + Math.random() * 3}s`;
+        sparkle.style.animationDelay = `${Math.random() * 2}s`;
+        sparklesLayer.appendChild(sparkle);
+      }
+    }
+
+    function launchConfetti() {
+      const layer = document.getElementById('confettiLayer');
+      layer.innerHTML = '';
+      for (let i = 0; i < 120; i++) {
+        const piece = document.createElement('span');
+        piece.className = 'piece';
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.setProperty('--h', Math.random() * 360);
+        piece.style.animationDuration = `${2 + Math.random() * 2.5}s`;
+        piece.style.animationDelay = `${Math.random() * 1.6}s`;
+        layer.appendChild(piece);
+      }
+      setTimeout(() => layer.innerHTML = '', 5200);
+    }
+
+    function typeTextForScreen(screenEl) {
+      const heading = screenEl.querySelector('.type-text');
+      if (!heading || heading.dataset.done === '1') return;
+      const text = heading.dataset.text.replace(/\\n/g, '\n');
+      heading.textContent = '';
+      let i = 0;
+      const tick = () => {
+        heading.textContent += text[i] === '\n' ? '\n' : text[i];
+        i++;
+        if (i < text.length) setTimeout(tick, 30);
+      };
+      heading.style.whiteSpace = 'pre-line';
+      tick();
+      heading.dataset.done = '1';
+    }
+
+    function showScreen(index) {
+      state.screens.forEach((s, i) => s.classList.toggle('active', i === index));
+      state.current = index;
+      typeTextForScreen(state.screens[index]);
+      if (index === 3) launchConfetti();
+    }
+
+    function moveNoButton() {
+      const noBtn = document.getElementById('no1');
+      const zone = document.getElementById('noZone1');
+      const tooltip = document.getElementById('tooltip1');
+      const maxX = zone.clientWidth - noBtn.offsetWidth;
+      const maxY = 40;
+      noBtn.style.position = 'absolute';
+      noBtn.style.left = `${Math.max(0, Math.random() * maxX)}px`;
+      noBtn.style.top = `${Math.random() * maxY}px`;
+      tooltip.classList.add('show');
+      playClickTone(760, 0.06);
+    }
+
+    // Events
+    document.getElementById('yes1').addEventListener('click', () => {
+      playClickTone();
+      showScreen(1);
+    });
+
+    const no1 = document.getElementById('no1');
+    ['mouseenter', 'click', 'touchstart'].forEach(evt => {
+      no1.addEventListener(evt, (e) => {
+        e.preventDefault();
+        moveNoButton();
+      });
+    });
+
+    document.getElementById('yes2').addEventListener('click', () => {
+      playClickTone();
+      showScreen(2);
+    });
+
+    document.getElementById('thinkBtn').addEventListener('click', (e) => {
+      playClickTone(500, 0.1);
+      state.thinkClicks++;
+      const popup = document.getElementById('popup');
+      popup.classList.add('show');
+      const btn = e.currentTarget;
+      btn.style.transform = `scale(${Math.max(0.55, 1 - state.thinkClicks * 0.1)})`;
+      setTimeout(() => popup.classList.remove('show'), 1300);
+    });
+
+    document.getElementById('yes3').addEventListener('click', () => {
+      playClickTone(720, 0.09);
+      showScreen(3);
+    });
+
+    document.getElementById('hmmBtn').addEventListener('click', () => {
+      playClickTone(360, 0.2);
+      const overlay = document.getElementById('overlay');
+      overlay.classList.add('show');
+      setTimeout(() => overlay.classList.remove('show'), 1800);
+    });
+
+    document.getElementById('surpriseBtn').addEventListener('click', () => {
+      playClickTone(880, 0.1);
+      window.alert('Surprise unlocked! Now go check your real gift 🎁❤️');
+      launchConfetti();
+    });
+
+    document.getElementById('restartBtn').addEventListener('click', () => {
+      playClickTone(640, 0.08);
+      showScreen(0);
+    });
+
+    // Music must start after interaction
+    const musicToggle = document.getElementById('musicToggle');
+    musicToggle.addEventListener('click', async () => {
+      try {
+        await audioCtx.resume();
+        if (!state.musicPlaying) {
+          startBackgroundMusic();
+          musicToggle.textContent = '🎵 Music: On';
+        } else {
+          stopBackgroundMusic();
+          musicToggle.textContent = '🎵 Music: Off';
+        }
+        state.musicPlaying = !state.musicPlaying;
+        playClickTone(920, 0.06);
+      } catch {
+        musicToggle.textContent = 'Tap again to enable music 🎵';
+      }
+    });
+
+    createParticles();
+    typeTextForScreen(state.screens[0]);
+  </script>
+</body>
+</html>
