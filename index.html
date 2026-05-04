@@ -317,7 +317,7 @@
     const state = {
       current: 0,
       thinkClicks: 0,
-      musicPlaying: false,
+      musicPlaying: true,
       screens: [...document.querySelectorAll('.screen')]
     };
 
@@ -508,6 +508,7 @@
 
     // Music must start after interaction
     const musicToggle = document.getElementById('musicToggle');
+    musicToggle.textContent = '🎵 Music: On';
     musicToggle.addEventListener('click', async () => {
       try {
         await audioCtx.resume();
@@ -524,6 +525,25 @@
         musicToggle.textContent = 'Tap again to enable music 🎵';
       }
     });
+
+    // Try to start music by default; if blocked, start on first interaction.
+    (async () => {
+      try {
+        await audioCtx.resume();
+        startBackgroundMusic();
+      } catch {
+        musicToggle.textContent = '🎵 Music: On (tap anywhere)';
+      }
+    })();
+
+    const bootMusicOnFirstGesture = async () => {
+      if (state.musicPlaying && !musicTimer) {
+        await audioCtx.resume();
+        startBackgroundMusic();
+      }
+      window.removeEventListener('pointerdown', bootMusicOnFirstGesture);
+    };
+    window.addEventListener('pointerdown', bootMusicOnFirstGesture, { once: true });
 
     createParticles();
     typeTextForScreen(state.screens[0]);
