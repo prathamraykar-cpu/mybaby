@@ -175,6 +175,7 @@
       min-height: 1.2rem;
       color: #7d2e76;
       font-weight: 600;
+codex/create-romantic-interactive-single-page-website-pnsrvz
       opacity: 0;
       transform: translateY(-4px);
       transition: opacity 0.25s ease, transform 0.25s ease;
@@ -183,6 +184,7 @@
     .tooltip.show {
       opacity: 1;
       transform: translateY(0);
+main
     }
 
     .tiny {
@@ -312,6 +314,10 @@
     </div>
   </div>
 
+codex/create-romantic-interactive-single-page-website-pnsrvz
+  <audio id="bgMusic" loop preload="auto" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_92c10f7358.mp3?filename=romantic-love-piano-21573.mp3"></audio>
+
+main
   <script>
     // Core app state
     const state = {
@@ -323,8 +329,10 @@
 
     // Small click pop sound generated from WebAudio
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+codex/create-romantic-interactive-single-page-website-pnsrvz
     let musicTimer = null;
     let activeMusicNodes = [];
+main
     function playClickTone(freq = 680, duration = 0.08) {
       const o = audioCtx.createOscillator();
       const g = audioCtx.createGain();
@@ -336,7 +344,7 @@
       g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
       o.stop(audioCtx.currentTime + duration);
     }
-
+codex/create-romantic-interactive-single-page-website-pnsrvz
     function stopBackgroundMusic() {
       if (musicTimer) {
         clearInterval(musicTimer);
@@ -376,6 +384,7 @@
       }, beat * 1000);
     }
 
+main
     function createParticles() {
       const heartsLayer = document.getElementById('heartsLayer');
       const sparklesLayer = document.getElementById('sparklesLayer');
