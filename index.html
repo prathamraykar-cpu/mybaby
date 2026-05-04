@@ -175,6 +175,16 @@
       min-height: 1.2rem;
       color: #7d2e76;
       font-weight: 600;
+codex/create-romantic-interactive-single-page-website-pnsrvz
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .tooltip.show {
+      opacity: 1;
+      transform: translateY(0);
+main
     }
 
     .tiny {
@@ -304,8 +314,10 @@
     </div>
   </div>
 
+codex/create-romantic-interactive-single-page-website-pnsrvz
   <audio id="bgMusic" loop preload="auto" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_92c10f7358.mp3?filename=romantic-love-piano-21573.mp3"></audio>
 
+main
   <script>
     // Core app state
     const state = {
@@ -317,6 +329,10 @@
 
     // Small click pop sound generated from WebAudio
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+codex/create-romantic-interactive-single-page-website-pnsrvz
+    let musicTimer = null;
+    let activeMusicNodes = [];
+main
     function playClickTone(freq = 680, duration = 0.08) {
       const o = audioCtx.createOscillator();
       const g = audioCtx.createGain();
@@ -328,7 +344,47 @@
       g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
       o.stop(audioCtx.currentTime + duration);
     }
+codex/create-romantic-interactive-single-page-website-pnsrvz
+    function stopBackgroundMusic() {
+      if (musicTimer) {
+        clearInterval(musicTimer);
+        musicTimer = null;
+      }
+      activeMusicNodes.forEach(({ osc, gain }) => {
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
+        osc.stop(audioCtx.currentTime + 0.25);
+      });
+      activeMusicNodes = [];
+    }
 
+    function playMusicNote(freq, duration = 0.5, delay = 0) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, audioCtx.currentTime + delay);
+      gain.gain.linearRampToValueAtTime(0.03, audioCtx.currentTime + delay + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + delay + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(audioCtx.currentTime + delay);
+      osc.stop(audioCtx.currentTime + delay + duration + 0.08);
+      activeMusicNodes.push({ osc, gain });
+    }
+
+    function startBackgroundMusic() {
+      const pattern = [523.25, 659.25, 783.99, 659.25, 698.46, 659.25, 587.33, 523.25];
+      let idx = 0;
+      const beat = 0.42;
+      stopBackgroundMusic();
+      musicTimer = setInterval(() => {
+        playMusicNote(pattern[idx % pattern.length], 0.4, 0);
+        playMusicNote(pattern[(idx + 2) % pattern.length] / 2, 0.5, 0.05);
+        idx++;
+      }, beat * 1000);
+    }
+
+main
     function createParticles() {
       const heartsLayer = document.getElementById('heartsLayer');
       const sparklesLayer = document.getElementById('sparklesLayer');
@@ -371,7 +427,7 @@
     function typeTextForScreen(screenEl) {
       const heading = screenEl.querySelector('.type-text');
       if (!heading || heading.dataset.done === '1') return;
-      const text = heading.dataset.text;
+      const text = heading.dataset.text.replace(/\\n/g, '\n');
       heading.textContent = '';
       let i = 0;
       const tick = () => {
@@ -394,11 +450,13 @@
     function moveNoButton() {
       const noBtn = document.getElementById('no1');
       const zone = document.getElementById('noZone1');
+      const tooltip = document.getElementById('tooltip1');
       const maxX = zone.clientWidth - noBtn.offsetWidth;
       const maxY = 40;
       noBtn.style.position = 'absolute';
       noBtn.style.left = `${Math.max(0, Math.random() * maxX)}px`;
       noBtn.style.top = `${Math.random() * maxY}px`;
+      tooltip.classList.add('show');
       playClickTone(760, 0.06);
     }
 
@@ -455,15 +513,15 @@
     });
 
     // Music must start after interaction
-    const music = document.getElementById('bgMusic');
     const musicToggle = document.getElementById('musicToggle');
     musicToggle.addEventListener('click', async () => {
       try {
+        await audioCtx.resume();
         if (!state.musicPlaying) {
-          await music.play();
+          startBackgroundMusic();
           musicToggle.textContent = '🎵 Music: On';
         } else {
-          music.pause();
+          stopBackgroundMusic();
           musicToggle.textContent = '🎵 Music: Off';
         }
         state.musicPlaying = !state.musicPlaying;
